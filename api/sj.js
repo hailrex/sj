@@ -113,15 +113,18 @@ function ensure() {
 			const path = pathMod.default || pathMod;
 			const compression = compressionMod.default || compressionMod;
 			const { routeRequest, routeUpgrade } = await bootstrap();
-			// capture every host the wisp tunnel opens (it logs each stream)
-			const origLog = console.log;
-			console.log = function (...a) {
-				try {
-					const m = /TCP stream to ([\w.-]+:\d+)/.exec(a.join(" "));
-					if (m) addLog({ ip: "", ua: "", kind: "tunnel", value: m[1] });
-				} catch (e) { /* ignore */ }
-				return origLog.apply(console, a);
-			};
+			// capture every host the wisp tunnel opens — its logger prints
+			// via console.info (level "info"), so hook that
+			for (const method of ["log", "info"]) {
+				const orig = console[method].bind(console);
+				console[method] = function (...a) {
+					try {
+						const m = /TCP stream to ([\w.-]+:\d+)/.exec(a.join(" "));
+						if (m) addLog({ ip: "", ua: "", kind: "tunnel", value: m[1] });
+					} catch (e) { /* ignore */ }
+					return orig(...a);
+				};
+			}
 			const app = express();
 			// gzip client assets + proxied text (3 MB of client code -> ~1 MB),
 			// then cache the immutable-ish client payload so reloads stop
