@@ -4,7 +4,7 @@ A self-hosted [Scramjet](https://github.com/MercuryWorkshop/scramjet) instance, 
 official `create-proxy-app` template (GPL-3 generated files; AGPL-3 packages — see `public/credits.html`).
 
 It runs ChatGPT-class sites that the arcade's built-in mirror can't (login + Cloudflare).
-**Verified working locally**: boots with plain `npm install && node server.js` (no rust toolchain —
+**Verified working locally**: boots with plain `npm install && node node-server.mjs` (no rust toolchain —
 the server downloads prebuilt client + transports at startup), and `chatgpt.com` loads through the
 tunnel past Cloudflare.
 

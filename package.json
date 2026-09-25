@@ -5,8 +5,8 @@
 	"main": "server.js",
 	"type": "module",
 	"scripts": {
-		"dev": "node server.js",
-		"start": "node server.js"
+		"dev": "node node-server.mjs",
+		"start": "node node-server.mjs"
 	},
 	"license": "AGPL-3.0-only",
 	"dependencies": {
