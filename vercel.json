@@ -3,7 +3,7 @@
   "functions": {
     "api/sj.js": {
       "maxDuration": 300,
-      "includeFiles": ["vendor/**", "public/**"]
+      "includeFiles": "{vendor/**,public/**}"
     }
   },
   "rewrites": [{ "source": "/(.*)", "destination": "/api/sj" }]
