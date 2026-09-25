@@ -20,15 +20,29 @@ function ensure() {
 	if (!initPromise) {
 		initPromise = (async () => {
 			// literal import paths on purpose: Vercel's tracer follows them
-			const [{ bootstrap }, expressMod, pathMod] = await Promise.all([
+			const [{ bootstrap }, expressMod, pathMod, compressionMod] = await Promise.all([
 				import("../vendor/proxy-bootstrap/dist/bootstrap-server.js"),
 				import("express"),
 				import("node:path"),
+				import("compression"),
 			]);
 			const express = expressMod.default || expressMod; // CJS interop
 			const path = pathMod.default || pathMod;
+			const compression = compressionMod.default || compressionMod;
 			const { routeRequest, routeUpgrade } = await bootstrap();
 			const app = express();
+			// gzip client assets + proxied text (3 MB of client code -> ~1 MB),
+			// then cache the immutable-ish client payload so reloads stop
+			// re-downloading it through the function on every visit.
+			app.use(compression());
+			app.use((req, res, next) => {
+				const p = req.path;
+				if (p === "/sw.js") res.setHeader("Cache-Control", "no-cache");
+				else if (p === "/" || p === "/index.html" || p === "/bootstrap-init.js") res.setHeader("Cache-Control", "no-cache");
+				else if (/^\/(scram|clients|controller)\//.test(p) || /^(index\.css|index\.js|icon\.png|credits\.html)$/.test(p.slice(1)))
+					res.setHeader("Cache-Control", "public, max-age=43200");
+				next();
+			});
 			app.use((req, res, next) => {
 				if (routeRequest(req, res)) return;
 				next();

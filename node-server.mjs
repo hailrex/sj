@@ -1,21 +1,10 @@
-import http from "node:http";
-import express from "express";
-import { bootstrap } from "./vendor/proxy-bootstrap/dist/bootstrap-server.js";
+// Standalone entry (Render/Koyeb/VPS/local). Same server as the Vercel
+// function (api/sj.js) — one code path, no drift.
+import { fileURLToPath } from "node:url";
 
-const { routeRequest, routeUpgrade } = await bootstrap();
+const here = fileURLToPath(new URL(".", import.meta.url));
+process.chdir(here); // api/sj.js resolves vendor/ + public/ from cwd
 
-const app = express();
-
-app.use((req, res, next) => {
-	if (routeRequest(req, res)) return;
-	next();
-});
-app.use(express.static("public"));
-
-const server = http.createServer(app);
-
-server.on("upgrade", routeUpgrade);
-
-server.listen(Number(process.env.PORT) || 3030, () => {
-	console.log("Server is running on port 3030");
-});
+const server = (await import("./api/sj.js")).default;
+const port = Number(process.env.PORT) || 3030;
+server.listen(port, () => console.log(`Server is running on port ${port}`));
