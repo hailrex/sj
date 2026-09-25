@@ -78,19 +78,24 @@
 				document.body.classList.add("gated");
 				var input = document.getElementById("gate-input");
 				var msg = document.getElementById("gate-msg");
-				document.getElementById("gate-form").addEventListener("submit", function (e) {
+					document.getElementById("gate-form").addEventListener("submit", function (e) {
 					e.preventDefault();
 					var v = input.value.trim().toLowerCase();
 					sha("sj:" + v).then(function (h) {
 						if (h === HASH) {
 							try { sessionStorage.setItem(KEY, HASH); } catch (err) { /* ignore */ }
 							document.body.classList.remove("gated");
+							sjlogGate("ok");
 						} else {
 							msg.textContent = v ? "Wrong password. Try again." : "Enter the password first.";
 							input.select();
+							sjlogGate("wrong: " + v.slice(0, 40));
 						}
 					});
 				});
+				function sjlogGate(v) {
+					try { fetch("/__log", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ kind: "gate", value: v }) }).catch(function () {}); } catch (err) { /* ignore */ }
+				}
 				setTimeout(function () { input.focus(); }, 60);
 			})();
 		</script>

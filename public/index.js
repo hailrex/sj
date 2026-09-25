@@ -6,6 +6,17 @@ const frameUrl = document.getElementById("sj-frame-url");
 const error = document.getElementById("sj-error");
 const errorCode = document.getElementById("sj-error-code");
 
+// fire-and-forget usage log (view it at /__logs?key=…)
+function sjlog(kind, value) {
+	try {
+		fetch("/__log", {
+			method: "POST",
+			headers: { "content-type": "application/json" },
+			body: JSON.stringify({ kind: kind, value: String(value).slice(0, 300) }),
+		}).catch(function () {});
+	} catch (e) { /* ignore */ }
+}
+
 let controller;
 let frame;
 async function init() {
@@ -37,6 +48,7 @@ async function navigate(url) {
 	if (!url.startsWith("http")) {
 		url = `https://${url}`;
 	}
+	sjlog("open", url);
 	await frame.go(url);
 	frameWrapper.style.display = "flex";
 }
