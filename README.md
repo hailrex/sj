@@ -12,22 +12,34 @@ tunnel past Cloudflare.
 
 ```bash
 npm install
-npm start          # http://127.0.0.1:3030  (first boot downloads ~3 MB of packages)
+npm start          # http://127.0.0.1:3030
 ```
 
-## Deploy (pick one always-on host)
+The scramjet client + transports are vendored in `vendor/` (pre-downloaded) — boots with no
+runtime downloads or writes.
 
-Vercel **cannot** host this (it needs raw TCP + websockets). Any plain Node host works.
+## Deploy (pick one)
 
-### Render (free tier is fine; sleeps after 15 min idle, slow first wake)
+### Vercel — same account as the arcade (WebSockets on Fluid compute)
 
-1. Render → New → Web Service → connect this GitHub repo.
-2. Build command: `npm install` — Start command: `npm start` — it reads `PORT` automatically.
-3. After deploy, note the URL (e.g. `sj-xxxx.onrender.com`).
+The repo is Vercel-ready: `api/sj.js` exports the express+wisp server in the official
+export-a-server WebSocket shape ([docs](https://vercel.com/docs/functions/websockets)),
+`vercel.json` routes everything to it, and `vendor/` + `public/` are force-included in the
+function bundle.
 
-### Koyeb / Railway / Fly / a $4 VPS
+1. Vercel → Add New → Project → import `hailrex/sj`. Deploy with defaults.
+2. Project → Settings → Domains → add `sj.hailrex.com` → in **Cloudflare** (where hailrex.com
+   DNS lives) add the CNAME it shows (usually `cname.vercel-dns.com`); orange-cloud is fine.
 
-Same pattern: Node 20+, `npm install`, `npm start`, expose the HTTP port.
+Caveats: Hobby-plan functions cap a connection at **5 minutes** — a long ChatGPT session gets
+its tunnel cut every 5 min and needs a page reload; new page loads just work. WebSockets are
+beta on Vercel — if a deploy complains about permissions, enable WebSockets in project settings.
+
+### Render / Koyeb / VPS (no 5-min cap; free tiers sleep when idle)
+
+1. Render → New → Web Service → connect this repo.
+2. Build `npm install`, start `npm start` — it reads `PORT` automatically.
+3. Same Cloudflare CNAME step, pointing at the host URL.
 
 ## Point sj.hailrex.com at it
 

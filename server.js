@@ -1,6 +1,6 @@
 import http from "node:http";
 import express from "express";
-import { bootstrap } from "@mercuryworkshop/proxy-bootstrap";
+import { bootstrap } from "./vendor/proxy-bootstrap/dist/bootstrap-server.js";
 
 const { routeRequest, routeUpgrade } = await bootstrap();
 
