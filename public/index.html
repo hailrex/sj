@@ -61,7 +61,7 @@
 			// Client-side lock (casual protection, same idea as the arcade's pw.js):
 			// salted SHA-256 of the lowercased password; remembered for the session.
 			(function () {
-				var HASH = "a8f8e2279a341b75cd19c28bf516f79f5e513fc9611996e761ce88205ee81da4";
+				var HASH = "43737e3e51eed2b2eeefc8c32ad22ef2a7a2243365c59cdc2f2ff1aa310965bb";
 				var KEY = "sj-auth";
 				function sha(s) {
 					return crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)).then(function (b) {
