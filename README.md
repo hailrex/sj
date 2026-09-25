@@ -46,3 +46,13 @@ default already points there).
   DNS-sinkholed on filtered networks, which shows up as a blank tab).
 - Don't share the URL widely; traffic through it is unencrypted-to-the-host (it's a proxy — the
   host sees everything, so only you should run it).
+
+## Troubleshooting ChatGPT
+
+- If ChatGPT instantly shows "Application Error" / lands on `/auth/undefined`: the network is
+  blocking `openai.com` at the connection level (verified on one filtered network — DNS stays
+  clean, connections reset). The app makes a direct request there for auth config. Try logging
+  in first (auth.openai.com is usually still reachable) or another network; on the real
+  deployment traffic mostly stays inside the tunnel.
+- Cloudflare "Just a moment…" that never resolves = cat-and-mouse loss; update the instance
+  (`@mercuryworkshop/proxy-bootstrap` version) and retry.
