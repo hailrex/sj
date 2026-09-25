@@ -29,16 +29,77 @@
 		<meta name="robots" content="noindex" />
 
 		<script src="/bootstrap-init.js"></script>
+		<style>
+			/* password gate */
+			#gate { display: none; position: fixed; inset: 0; background: #0b0d1a; z-index: 999; place-items: center; }
+			body.gated #gate { display: grid; }
+			body.gated .logo-wrapper, body.gated .desc, body.gated #sj-form,
+			body.gated footer, body.gated #sj-frame-wrapper { display: none; }
+			#gate .gate-card { background: #151a2e; color: #e8eaf6; padding: 28px 30px; border-radius: 14px;
+				width: min(320px, 88vw); text-align: center; font: 15px/1.5 system-ui, Arial, sans-serif; }
+			#gate .gate-card h2 { margin: 0 0 6px; font-size: 20px; }
+			#gate .gate-card p { margin: 0 0 16px; color: #a9b0d8; }
+			#gate input { width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 8px;
+				border: 1px solid #2c3352; background: #0e1224; color: #e8eaf6; font-size: 15px; }
+			#gate button { margin-top: 12px; width: 100%; padding: 10px 0; border: 0; border-radius: 999px;
+				background: #1a73e8; color: #fff; font-weight: 600; font-size: 15px; cursor: pointer; }
+			#gate .gate-msg { min-height: 20px; margin: 10px 0 0 !important; color: #ff9d9d !important; }
+		</style>
 	</head>
 	<body>
+		<div id="gate">
+			<form id="gate-form" class="gate-card" autocomplete="off" novalidate>
+				<h2>Math Notes</h2>
+				<p>Sign in to continue to your class notes.</p>
+				<input id="gate-input" type="password" placeholder="Password" aria-label="Password"
+					autocapitalize="off" autocorrect="off" spellcheck="false" />
+				<p id="gate-msg" class="gate-msg" role="alert"></p>
+				<button type="submit">Sign in</button>
+			</form>
+		</div>
+		<script>
+			// Client-side lock (casual protection, same idea as the arcade's pw.js):
+			// salted SHA-256 of the lowercased password; remembered for the session.
+			(function () {
+				var HASH = "a8f8e2279a341b75cd19c28bf516f79f5e513fc9611996e761ce88205ee81da4";
+				var KEY = "sj-auth";
+				function sha(s) {
+					return crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)).then(function (b) {
+						return Array.from(new Uint8Array(b)).map(function (x) {
+							return x.toString(16).padStart(2, "0");
+						}).join("");
+					});
+				}
+				function already() {
+					try { return sessionStorage.getItem(KEY) === HASH || localStorage.getItem(KEY) === HASH; }
+					catch (e) { return false; }
+				}
+				if (already()) return;
+				document.body.classList.add("gated");
+				var input = document.getElementById("gate-input");
+				var msg = document.getElementById("gate-msg");
+				document.getElementById("gate-form").addEventListener("submit", function (e) {
+					e.preventDefault();
+					var v = input.value.trim().toLowerCase();
+					sha("sj:" + v).then(function (h) {
+						if (h === HASH) {
+							try { sessionStorage.setItem(KEY, HASH); } catch (err) { /* ignore */ }
+							document.body.classList.remove("gated");
+						} else {
+							msg.textContent = v ? "Wrong password. Try again." : "Enter the password first.";
+							input.select();
+						}
+					});
+				});
+				setTimeout(function () { input.focus(); }, 60);
+			})();
+		</script>
 		<div title="Scramjet Logo" class="flex-center logo-wrapper header-center">
 			<h1>Notes</h1>
 		</div>
 		<div class="flex-center desc left-margin">
 			<p>
-				Congratulations! You've successfully created a web proxy powered by
-				Scramjet and Wisp. Your proxy is now ready to be customized by editing
-				the public/index.html file.
+				Type a site below to open it here.
 			</p>
 		</div>
 

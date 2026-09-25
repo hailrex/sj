@@ -68,3 +68,14 @@ default already points there).
   deployment traffic mostly stays inside the tunnel.
 - Cloudflare "Just a moment…" that never resolves = cat-and-mouse loss; update the instance
   (`@mercuryworkshop/proxy-bootstrap` version) and retry.
+
+## Password
+
+The page is gated (password: `Math`, case-insensitive, salted SHA-256 in `public/index.html`)
+like the arcade's lock — a client-side gate for casual visitors. To change it:
+
+```bash
+node -e "console.log(require('crypto').createHash('sha256').update('sj:' + 'NEWPASSWORD'.toLowerCase()).digest('hex'))"
+```
+
+…then swap the `HASH` string. Honest limit: it hides the page, not the `/wisp/` endpoint.
