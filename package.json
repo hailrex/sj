@@ -1,23 +1,16 @@
 {
-	"name": "proxy-app-template",
+	"name": "sj",
 	"version": "1.0.0",
-	"description": "",
+	"description": "Scramjet proxy instance (vendored payloads, Vercel + Node hosts)",
 	"main": "server.js",
 	"type": "module",
 	"scripts": {
 		"dev": "node server.js",
 		"start": "node server.js"
 	},
-	"keywords": [],
-	"author": "",
 	"license": "AGPL-3.0-only",
 	"dependencies": {
-		"@mercuryworkshop/proxy-bootstrap": "*",
+		"@mercuryworkshop/proxy-bootstrap": "^0.0.5",
 		"express": "^4.21.2"
-	},
-	"devDependencies": {
-		"@mercuryworkshop/scramjet-utils": "*",
-		"@mercuryworkshop/scramjet-controller": "*",
-		"@mercuryworkshop/scramjet": "*"
 	}
 }
